@@ -11,7 +11,7 @@
 
             // --- declared internal variables ---
             var self = this;
-            self.serviceName = "antibes"; // hardcoded until we got several....
+            self.serviceName = "antibes-casa"; // hardcoded until we got several....
             self.settings = {};
             self.vz_ids = [];
 

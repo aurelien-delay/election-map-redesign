@@ -23,7 +23,7 @@
 
         function getVotingZone(vz_id)
         {
-            console.log("call voting zones DB with ID", vz_id);
+            // console.log("call voting zones DB with ID", vz_id);
             return $http.get('/api/votingzone/' + vz_id);
         }
     }

@@ -65,7 +65,7 @@
 
         function renderZoneInMap(data)
         {
-            console.log("rendering voting zone", data.vz_id);
+            // console.log("rendering voting zone", data.vz_id);
             var geojson = JSON.parse(data.geojson);
             setVotingZoneIDInFeatures(geojson, data.vz_id);
             map.data.addGeoJson(geojson);
