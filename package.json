@@ -26,6 +26,8 @@
     "phantomjs": "^1.9.18"
   },
   "dependencies": {
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "mysql": "^2.10.2",
+    "sequelize": "^3.17.3"
   }
 }

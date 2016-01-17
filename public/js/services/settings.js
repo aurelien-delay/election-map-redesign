@@ -13,10 +13,10 @@
         };
 
         // --- implement all functions linked to return ---
-        function getSettings()
+        function getSettings(settingsName)
         {
-            console.log("call settings DB");
-            return $http.get('/api/settings/');
+            console.log("call settings DB with name", settingsName);
+            return $http.get('/api/settings/' + settingsName);
         }
     }
 })();

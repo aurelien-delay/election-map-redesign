@@ -33,3 +33,7 @@ public/components
 
 # Optional REPL history
 .node_repl_history
+
+# local DB config files
+sql_connection.json
+sql_connection_dev.json
