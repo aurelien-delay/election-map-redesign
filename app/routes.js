@@ -1,10 +1,10 @@
 var path = require('path');
 
 module.exports = function(app) {
-    app.get('*', helloWorld);
+    app.get('*', redirectHomePage);
 };
 
-function helloWorld (req, res)
+function redirectHomePage (req, res)
 {
     res.sendFile('index.html', { root: path.join(__dirname, '../public') });
 }
