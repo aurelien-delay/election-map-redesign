@@ -7,7 +7,7 @@
 
     function getSettingsServices($http)
     {
-        // --- return functions to read/write in appart DB ---
+        // --- return functions to read in settings DB ---
         return {
             get: getSettings
         };

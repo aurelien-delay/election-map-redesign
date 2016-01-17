@@ -6,6 +6,7 @@ if ( process.env.NODE_ENV === "production" )        config = require('./sql_conn
 else                                                config = require('./sql_connection_dev.json');
 var Sequelize = require('sequelize');
 var SettingsModel = require('./models/settings.js');
+var VotingZoneModel = require('./models/votingZone.js');
 
 
 // --- set the connection and others optons in a central sequelize object ---
@@ -13,11 +14,13 @@ var sequelize = new Sequelize(config.database, config.user, config.password, con
 
 // --- define all the models ---
 var settings = SettingsModel.getSettingsModel(sequelize);
+var votingZone = VotingZoneModel.getVotingZoneModel(sequelize);
 
 // sequelize.sync().then(function(){console.log("sync finished");});
 
-// --- export the sequelize object with all the settings, and all the defined model ---
+// --- export the sequelize object with all the options, and all the defined models ---
 module.exports = {
     sequelize: sequelize,
-    settings: settings
+    settings: settings,
+    votingZone: votingZone
 }

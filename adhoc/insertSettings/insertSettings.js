@@ -1,4 +1,3 @@
-// set up ======================================================================
 var connection = require("../../app/connection.js");
 
 var settingsToInsert = require("./settingsToInsert.json");

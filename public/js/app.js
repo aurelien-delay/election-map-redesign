@@ -2,7 +2,7 @@
 {
     'use strict';
 
-    angular.module('app', ['app.generalCtrl', 'app.settings', 'ngRoute'])
+    angular.module('app', ['app.generalCtrl', 'app.settings', 'app.votingZones', 'ngRoute'])
     // --- routing ---
     .config(['$routeProvider', function ($routeProvider)
     {

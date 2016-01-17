@@ -2,10 +2,10 @@
 {
     'use strict';
     angular.module('app')
-        .directive('map', [ /*'Utils', */directiveMap]);
+        .directive('map', ["accessVotingZonesDB", directiveMap]);
 
 
-    function directiveMap( /* Utils */ )
+    function directiveMap( accessVotingZonesDB )
     {
         return {
             restrict : 'E',
@@ -21,20 +21,24 @@
                 zoom: scope.ctrl.settings.zoom,
                 center: {"lat": scope.ctrl.settings.center_lat, "lng": scope.ctrl.settings.center_lng}
             };
-            console.info("loading google map with options: ", options);
+            console.info("loading google map with options: ", options, " in element", element );
 
-            /*
             scope.ctrl.map = new google.maps.Map(element[0], options);
 
 
             // --- load the perimeters ---
+            // wait for the controller to be ready with voting IDs from DB.
+            scope.ctrl.vz_ids_promise.success( readAndRender );
+            function readAndRender() { readAndRenderVotingZonesOneByOne(accessVotingZonesDB, scope.ctrl.map, scope.ctrl.vz_ids); }
+
+
             // scope.ctrl.map.data.loadGeoJson(scope.ctrl.settings.map);
 
             // --- set area default style ---
             scope.ctrl.map.data.setStyle({fillColor: 'black', fillOpacity: scope.ctrl.settings.opacity, strokeOpacity: scope.ctrl.settings.opacity});
 
             // --- set map with default election ---
-            // Utils.changeElection( scope.ctrl.settings, scope.ctrl.focusElection, scope.ctrl.map, scope.ctrl.focusLabel, scope.ctrl.max, //init=true );
+            // Utils.changeElection( scope.ctrl.settings, scope.ctrl.focusElection, scope.ctrl.map, scope.ctrl.focusLabel, scope.ctrl.max, /*init=*/true );
 
             // --- set hover event listening ---
             var listener = scope.ctrl.map.addListener('idle', afterMapLoaded);
@@ -45,8 +49,34 @@
                 // scope.ctrl.map.data.addListener('click', scope.ctrl.fixTooltip);
                 // --- once finished, remove this listener ---
                 google.maps.event.removeListener(listener);
+                console.info("Map is idle");
             }
-            */
+        }
+    }
+
+    function readAndRenderVotingZonesOneByOne(accessVotingZonesDB, map, votingZoneIDs)
+    {
+        console.log("read voting zones one by one");
+        for ( var index in votingZoneIDs )
+        {
+            var promise = accessVotingZonesDB.getOne(votingZoneIDs[index].vz_id);
+            promise.success( renderZoneInMap );
+        }
+
+        function renderZoneInMap(data)
+        {
+            console.log("rendering voting zone", data.vz_id);
+            var geojson = JSON.parse(data.geojson);
+            setVotingZoneIDInFeatures(geojson, data.vz_id);
+            map.data.addGeoJson(geojson);
+        }
+
+        function setVotingZoneIDInFeatures(geojson, vz_id)
+        {
+            for ( var index in geojson.features )
+            {
+                geojson.features[index].properties.vz_id = vz_id;
+            }
         }
     }
 })();
