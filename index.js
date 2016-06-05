@@ -7,6 +7,7 @@ console.log(process.env);
 
 
 // configuration ===============================================================
+console.log(__dirname);
 app.use(express.static(__dirname + '/public')); 		// set the static files location. e.g. /public/img will be /img for users
 
 // routes ======================================================================

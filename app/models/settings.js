@@ -38,8 +38,6 @@ var settingsGetSet = {
         elections:  function(v){ this._elections = JSON.stringify(v);  },
         partyOrder: function(v){ this._partyOrder = JSON.stringify(v); },
     }
-
-
 };
 
 // --- Instantiate the new model with Sequelize ---

@@ -1,0 +1,30 @@
+election-map flows...
+
+*** display map :
+- choose zone/precision     
+    ==> display resulting map, with list of filled elections...
+    - click on election, or evolution between election.
+    - choose party to focus on
+    - hover on zone to display result
+    - click on zone to fix its result
+    - choose condition to put a marker on matching zones
+    - choose color scale / transparency
+    
+*** fill election :
+- add/delete/update party
+- add/delete/update election
+
+- for one election:
+    - choose precision (commune, bureaux de vote etc...)
+    - add one global zone, meaning zone where the lists/candidates will be the same (ex: region for regionale, circonscription for legislatives, canton for depatementales etc...)
+        ==>
+        - fill lists/candidates for the global zone
+        - add voting zone (commune, bureaux...), enter the result.
+        
+    - upload json file
+
+
+
+*** fill map :
+- upload json file
+    ==> split into one-zone json file
