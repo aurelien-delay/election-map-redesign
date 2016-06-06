@@ -1,4 +1,18 @@
 <div id="container">
     <!-- load the map in background -->
     <map id="map" ng-if="ctrl.initMapFinished"></map>
+
+    <!-- List of available elections and their evolution -->
+    <!-- Click to display one of them -->
+    <div id="election-buttons" class="text-center">
+        <div class="btn-group" style="{height:100%}">
+            <button type="button" class="btn btn-primary elecButton"
+                    ng-repeat="button in ctrl.elections" ng-class="{'active':ctrl.currentElection==button.election_id}" ng-click="ctrl.changeElection(button)" >
+                <p>{{button.electionShortName}}</p>
+            </button>
+            <button type="button" class="btn btn-success elecButton" ng-click="ctrl.displayEvo()">
+                <i class="material-icons md-18">trending_up</i>
+            </button>
+        </div>
+    </div>
 </div>

@@ -17,3 +17,17 @@ html, body, #ng-view
     height: 100%;
     display: block;
 }
+
+#election-buttons
+{
+    position: absolute;
+    top: 20px;
+    left: 0px;
+    right: 0px;
+    text-align: center;
+}
+
+.elecButton
+{
+    height: 40px;
+}

@@ -35,7 +35,7 @@ function readOneVotingZone(connection, vz_id, res)
 
     function returnVotingZone(votingZone)
     {
-        console.log("return voting zone", votingZone );
+        console.log("return voting zone", votingZone.vz_id );
         res.json(votingZone);
     }
 }
