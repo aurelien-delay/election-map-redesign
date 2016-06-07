@@ -11,7 +11,8 @@ var electionProperties = {
     settingsName:           {type: Sequelize.STRING},
     election_id:            {type: Sequelize.STRING},
     electionFullName:       {type: Sequelize.STRING},
-    electionShortName:      {type: Sequelize.STRING}
+    electionShortName:      {type: Sequelize.STRING},
+    electionDate:           {type: Sequelize.DATE}
 };
 
 // --- Instantiate the new model with Sequelize ---

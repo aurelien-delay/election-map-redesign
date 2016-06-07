@@ -28,11 +28,17 @@
             self.displayTooltip = false;
             self.tooltipFixed = false;
             self.tooltipVz = {};
+            self.electionForEvo1 = null;
+            self.electionForEvo2 = null;
+            self.resultsForEvo = null;
+            self.resultsForEvo1 = null;
+            self.resultsForEvo2 = null;
             self.settingsPromise = $q.defer();
             self.mapPromise = $q.defer();
             self.partiesPromise = $q.defer();
             self.resultsPromise = $q.defer();
             self.vz_ids_promise = $q.defer();
+            self.searchForEvoPromise = $q.defer();
 
             // --- provided functions ---
             self.changeElection = changeElection;
@@ -88,11 +94,11 @@
 
             function readAndLoadElectionResults()
             {
-                readElectionResults();
+                readCurrentElectionResults();
                 loadPartyList();
                 loadPartyColorSafe();
             }
-            function readElectionResults()
+            function readCurrentElectionResults()
             {
                 self.resultsPromise = $q.defer();
                 accessResultsDB.get(self.currentElection).success( setCurrentElectionResults );
@@ -117,7 +123,7 @@
             function loadPartyList()
             {
                 self.resultsPromise.promise.then(callPartyList);
-                function callPartyList() { self.partyList = colorMap.getPartyList(self.settings, self.parties, self.currentParty, self.results);};
+                function callPartyList() { self.partyList = colorMap.getPartyList(self.settings, self.parties, self.results);};
             }
 
             function loadColorScale()
@@ -142,6 +148,42 @@
             function displayEvo()
             {
                 console.log("display evolution");
+
+                if ( self.elections.length == 2 )
+                {
+                    self.electionForEvo1 = self.elections[0];
+                    self.electionForEvo2 = self.elections[1];
+                }
+
+                if ( !self.electionForEvo1 || !self.electionForEvo2 )   return;
+
+                self.searchForEvoPromise = readTwoElectionResults();
+                self.searchForEvoPromise.then( colorEvolution );
+                function colorEvolution()
+                {
+                    self.resultsForEvo = colorMap.generateEvoResult(self.settings, self.parties, self.resultsForEvo1, self.resultsForEvo2, self.electionForEvo1, self.electionForEvo2);
+                    console.log("Results for evo", self.resultsForEvo);
+                }
+
+                function readTwoElectionResults()
+                {
+                    var promise1 = $q.defer();
+                    var promise2 = $q.defer();
+                    accessResultsDB.get(self.electionForEvo1.election_id).success( setElectionForEvo1 );
+                    accessResultsDB.get(self.electionForEvo2.election_id).success( setElectionForEvo2 );
+                    return $q.all([promise1.promise, promise2.promise]);
+
+                    function setElectionForEvo1(data) {
+                        console.log("returned election 1 results", data);
+                        promise1.resolve();
+                        self.resultsForEvo1 = data;
+                    }
+                    function setElectionForEvo2(data) {
+                        console.log("returned election 2 results", data);
+                        promise2.resolve();
+                        self.resultsForEvo2 = data;
+                    }
+                }
                 // open window to choose 2 elections.
                 // then display the diff between the 2 elections......
             }

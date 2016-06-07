@@ -4,13 +4,15 @@
             "settingsName": "antibes-casa",
             "election_id": "dep2015",
             "electionFullName": "Departementales 2015",
-            "electionShortName": "Dep. 2015"
+            "electionShortName": "Dep. 2015",
+            "electionDate": "2015-03-22 00:00:00"
         },
         {
             "settingsName": "antibes-casa",
             "election_id": "reg2015",
             "electionFullName": "Regionales 2015",
-            "electionShortName": "Reg. 2015"
+            "electionShortName": "Reg. 2015",
+            "electionDate": "2015-12-06 00:00:00"
         }
     ]
 }

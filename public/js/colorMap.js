@@ -10,6 +10,8 @@
         // --- return functions to read in settings DB ---
         return {
             loadParty: loadParty,
+            loadEvolution: loadEvolution,
+            generateEvoResult: generateEvoResult,
             getPartyColor: getPartyColor,
             getPartyList: computeSortedLabelList,
             calcColorScale: calcColorScale,
@@ -51,6 +53,50 @@
             }
         }
 
+        function generateEvoResult(settings, parties, results1, results2, election1, election2)
+        {
+            console.log("Start generateEvoResult");
+            var output = [];
+            // --- first sort elections by date ---
+            var res1 = results1;
+            var res2 = results2;
+            if ( election1.electionDate < election2.electionDate ) { res2 = results1;  res1 = results2; }
+
+            // --- determine the list of parties present in both results ---
+            // the ones in only one of them won't be part of the output
+            var partiesInBoth = computeLabelListInBoth(settings, parties, res1, res2);
+
+            // --- Inside each voting zone, for each party, compute the diff of exprimes ratio ---
+            for ( var i in res1 )
+            {
+                var vz_result1 = res1[i];
+                var vz_result2 = findResultForSameVotingZone(vz_result1.vz_id, res2);
+                if ( !vz_result2 )      continue;
+
+                for ( var j in partiesInBoth )
+                {
+                    var partyInRes1 = findPartyResult(partiesInBoth[j], vz_result1);
+                    var partyInRes2 = findPartyResult(partiesInBoth[j], vz_result2);
+                    if ( !partyInRes1 || !partyInRes2 )     continue;
+
+                    var exprimesRatio1 = getPartyRatio(partyInRes1, vz_result1);
+                    var exprimesRatio2 = getPartyRatio(partyInRes2, vz_result2);
+                    output.push({"vz_id":vz_result1.vz_id, "diff": (exprimesRatio2 - exprimesRatio1)});
+                }
+            }
+            console.log("Finish generateEvoResult");
+            return output;
+        }
+
+        function loadEvolution(map, settings, parties, results1, results2, party)
+        {
+            // console.log("loadParty", map, results, parties,  newParty);
+            var color = getPartyColor(settings, parties, newParty);
+
+            // --- use googlemap functions to set the new colors in zones ---
+            map.data.setStyle( colorOneVotingZone );
+        }
+
         function getPartyColor(settings, parties, party)
         {
             if ( party === "abstention" )   return settings.abstentionColor;
@@ -61,7 +107,7 @@
             return settings.emptyColor;
         }
 
-        function computeSortedLabelList(settings, parties, currentParty, results)
+        function computeSortedLabelList(settings, parties, results)
         {
             var output = [];
             var labelDone = {}; // will use the 'Object' to simulate a std::set
@@ -183,12 +229,12 @@
 
         function getPartyRatio(partyResult, zoneResult)
         {
-            return Math.round(partyResult.voix * 100 / zoneResult.exprimes).toFixed(2);
+            return (partyResult.voix * 100 / zoneResult.exprimes).toFixed(2);
         }
 
         function getNonExprimesRatio(zoneResult)
         {
-            return Math.round( (zoneResult.inscrits - zoneResult.exprimes) * 100 / zoneResult.inscrits ).toFixed(2);
+            return ( (zoneResult.inscrits - zoneResult.exprimes) * 100 / zoneResult.inscrits ).toFixed(2);
         }
 
         function getPartyResult(zoneResult, newParty)
@@ -213,5 +259,42 @@
             return Math.round( step*max/100 );
         }
 
+        function computeLabelListInBoth(settings, parties, res1, res2)
+        {
+            var output = [];
+            var partyList1 = computeSortedLabelList(settings, parties, res1);
+            var partyList2 = computeSortedLabelList(settings, parties, res2);
+
+            for ( var i in partyList1 )
+            {
+                for ( var j in partyList2 )
+                {
+                    if ( partyList1[i]['label'] == partyList2[j]['label'] )   output.push(partyList1[i]['label']);
+                }
+            }
+            return output;
+        }
+
+        function findResultForSameVotingZone(vz_id, results)
+        {
+            for ( var i in results )
+            {
+                if ( vz_id === results[i].vz_id )   return results[i];
+            }
+            return null;
+        }
+
+        function findPartyResult(party, vz_result)
+        {
+            for ( var i in vz_result.vz_result_candidates )
+            {
+                var partyList = vz_result.vz_result_candidates[i]['label'];
+                for ( var j in partyList )
+                {
+                    if ( party === partyList[j] )       return vz_result.vz_result_candidates[i];
+                }
+            }
+            return null;
+        }
     }
 })();
