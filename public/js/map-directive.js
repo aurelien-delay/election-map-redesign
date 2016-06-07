@@ -38,16 +38,13 @@
             // --- set area default style ---
             scope.ctrl.map.data.setStyle({fillColor: 'black', fillOpacity: scope.ctrl.settings.opacity, strokeOpacity: scope.ctrl.settings.opacity});
 
-            // --- set map with default election ---
-            // Utils.changeElection( scope.ctrl.settings, scope.ctrl.focusElection, scope.ctrl.map, scope.ctrl.focusLabel, scope.ctrl.max, /*init=*/true );
-
             // --- set hover event listening ---
             var listener = scope.ctrl.map.addListener('idle', afterMapLoaded);
 
             function afterMapLoaded(event) {
-                // scope.ctrl.map.data.addListener('mouseover', scope.ctrl.openTooltip);
-                // scope.ctrl.map.data.addListener('mouseout', scope.ctrl.closeTooltip);
-                // scope.ctrl.map.data.addListener('click', scope.ctrl.fixTooltip);
+                scope.ctrl.map.data.addListener('mouseover', scope.ctrl.openTooltip);
+                scope.ctrl.map.data.addListener('mouseout', scope.ctrl.closeTooltip);
+                scope.ctrl.map.data.addListener('click', scope.ctrl.fixTooltip);
                 // --- once finished, remove this listener ---
                 google.maps.event.removeListener(listener);
                 console.info("Map is idle", scope.ctrl.map);

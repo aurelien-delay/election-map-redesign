@@ -25,6 +25,9 @@
             self.colorScale = [];
             self.textScale = [];
             self.maxColor = 0;
+            self.displayTooltip = false;
+            self.tooltipFixed = false;
+            self.tooltipVz = {};
             self.settingsPromise = $q.defer();
             self.mapPromise = $q.defer();
             self.partiesPromise = $q.defer();
@@ -36,6 +39,9 @@
             self.displayEvo = displayEvo;
             self.changeParty = changeParty;
             self.changeMaxColor = changeMaxColor;
+            self.openTooltip = openTooltip;
+            self.closeTooltip = closeTooltip;
+            self.fixTooltip = fixTooltip;
 
             // --- fill internal variables ---
             // BEWARE : map-directive is played at the same time.
@@ -151,6 +157,70 @@
             {
                 console.log("change max color", self.currentMaxScore);
                 loadPartyColorSafe();
+            }
+
+            function openTooltip(event)
+            {
+                // open new tooltip only if one is not already fixed
+                if ( ! self.tooltipFixed )
+                {
+                    // make sure results are ready
+                    self.resultsPromise.promise.then(generateTooltip);
+
+                    function generateTooltip()
+                    {
+                        self.displayTooltip = true;
+                        self.tooltipVz = colorMap.getTooltip(self.settings, self.parties, event.feature, self.results);
+                    }
+                    $scope.$apply();
+                }
+            }
+
+            function closeTooltip(event)
+            {
+                // close tooltip only if not fixed
+                if ( ! self.tooltipFixed )
+                {
+                    self.displayTooltip = false;
+                    $scope.$apply();
+                }
+            }
+
+            function fixTooltip(event)
+            {
+                // console.log(event.feature);
+                var newName = event.feature.getProperty("Name");
+                var oldName;
+                if ( self.tooltipFixed )    oldName = self.tooltipFixed.feature.getProperty("Name");
+
+                // area is already fixed, click on same area - stop fixing the tooltip
+                if ( self.tooltipFixed && oldName === newName)
+                {
+                    self.tooltipFixed = null;
+                    self.map.data.revertStyle(event.feature);
+                }
+                // click on another area, fix this one
+                else if ( self.tooltipFixed && oldName !== newName)
+                {
+                    self.map.data.revertStyle();
+                    self.tooltipFixed = null;
+                    openTooltip(event);
+                    self.tooltipFixed = event;
+                    self.map.data.overrideStyle(event.feature, {
+                        strokeOpacity: 1,
+                        strokeColor: 'red',
+                        strokeWeight: 5
+                    });
+                }
+                else
+                {
+                    self.tooltipFixed = event;
+                    self.map.data.overrideStyle(event.feature, {
+                        strokeOpacity: 1,
+                        strokeColor: 'red',
+                        strokeWeight: 5
+                    });
+                }
             }
         }
 })();

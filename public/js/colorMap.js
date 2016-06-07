@@ -13,7 +13,8 @@
             getPartyColor: getPartyColor,
             getPartyList: computeSortedLabelList,
             calcColorScale: calcColorScale,
-            calcTextScale: calcTextScale
+            calcTextScale: calcTextScale,
+            getTooltip: generateTooltip
         };
 
         // --- implement all functions linked to return ---
@@ -110,7 +111,8 @@
             }
         }
 
-        function calcColorScale(settings, parties, party, max){
+        function calcColorScale(settings, parties, party, max)
+        {
             var partyColor = getPartyColor(settings, parties, party);
             var output = [];
             for ( var index = 0 ; index < 10 ; ++index )
@@ -124,7 +126,8 @@
             return output;
         }
 
-        function calcTextScale(max){
+        function calcTextScale(max)
+        {
             var output = [];
             for ( var index = 0 ; index <= 10 ; ++index )
             {
@@ -135,6 +138,35 @@
                 output.push(percentile);
 
             }
+            return output;
+        }
+
+        function generateTooltip(settings, parties, feature, results)
+        {
+            // --- find voting zone result related to the cliked polygon ---
+            var output = {};
+            var vzResult = getZoneFromPolygon(feature, results);
+            if ( vzResult )
+            {
+                // --- loop on party results and fill output object ---
+                output.Name = feature.getProperty("Name");
+                output.partyResults = [];
+                console.log(vzResult);
+                for ( var i in vzResult.vz_result_candidates )
+                {
+                    var partyLine = {};
+                    var partyResult = vzResult.vz_result_candidates[i];
+                    var partyListInResult = partyResult.party_labels['label'];
+                    partyLine.label = partyListInResult.join("/");
+                    partyLine.color = getPartyColor(settings, parties, partyListInResult[0] );
+                    partyLine.ratio_exprimes = getPartyRatio(partyResult, vzResult);
+                    output.partyResults.push(partyLine);
+                }
+
+                // --- add abstention ratio to output object ---
+                output.non_exprimes_ratio = getNonExprimesRatio(vzResult);
+            }
+            console.log("tooltip:", output);
             return output;
         }
 
@@ -151,8 +183,13 @@
 
         function getPartyRatio(partyResult, zoneResult)
         {
-            // --- return the ratio with exprimes ---
-            return partyResult.voix * 100 / zoneResult.exprimes;
+            return Math.round(partyResult.voix * 100 / zoneResult.exprimes).toFixed(2);
+        }
+
+        function getNonExprimesRatio(zoneResult)
+        {
+            console.log(zoneResult);
+            return Math.round( (zoneResult.inscrits - zoneResult.exprimes) * 100 / zoneResult.inscrits ).toFixed(2);
         }
 
         function getPartyResult(zoneResult, newParty)
