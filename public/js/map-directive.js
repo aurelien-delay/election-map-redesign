@@ -16,6 +16,7 @@
         // internal function implemented here in order to access dependencies
         function linkMap(scope, element)
         {
+            // --- create google map ---
             var options =
             {
                 zoom: scope.ctrl.settings.zoom,
@@ -28,7 +29,7 @@
 
             // --- load the perimeters ---
             // wait for the controller to be ready with voting IDs from DB.
-            scope.ctrl.vz_ids_promise.success( readAndRender );
+            scope.ctrl.vz_ids_promise.promise.then( readAndRender );
             function readAndRender() { readAndRenderVotingZonesOneByOne(accessVotingZonesDB, scope.ctrl.map, scope.ctrl.vz_ids); }
 
 
@@ -51,37 +52,43 @@
                 google.maps.event.removeListener(listener);
                 console.info("Map is idle", scope.ctrl.map);
             }
-        }
 
-        function readAndRenderVotingZonesOneByOne(accessVotingZonesDB, map, votingZoneIDs)
-        {
-            console.log("read voting zones one by one");
-            var promises = [];
-            for ( var index in votingZoneIDs )
+            function readAndRenderVotingZonesOneByOne(accessVotingZonesDB, map, votingZoneIDs)
             {
-                var promise = accessVotingZonesDB.getOne(votingZoneIDs[index].vz_id);
-                promise.success( renderZoneInMap );
-                promises.push(promise);
-            }
-
-            return $q.all(promises).then(function(){ console.log("Finish rendering voting zones"); });
-
-            // --- internal functions ---
-            function renderZoneInMap(data)
-            {
-                // console.log("rendering voting zone", data.vz_id);
-                var geojson = JSON.parse(data.geojson);
-                setVotingZoneIDInFeatures(geojson, data.vz_id);
-                map.data.addGeoJson(geojson);
-            }
-
-            function setVotingZoneIDInFeatures(geojson, vz_id)
-            {
-                for ( var index in geojson.features )
+                console.log("read voting zones one by one");
+                var promises = [];
+                for ( var index in votingZoneIDs )
                 {
-                    geojson.features[index].properties.vz_id = vz_id;
+                    var promise = accessVotingZonesDB.getOne(votingZoneIDs[index].vz_id);
+                    promise.success( renderZoneInMap );
+                    promises.push(promise);
+                }
+
+                return $q.all(promises).then( zonesAreRendered );
+                function zonesAreRendered()
+                {
+                    console.log("Finished rendering voting zones");
+                    scope.ctrl.mapPromise.resolve();
+                }
+
+                // --- internal functions ---
+                function renderZoneInMap(data)
+                {
+                    // console.log("rendering voting zone", data.vz_id);
+                    var geojson = JSON.parse(data.geojson);
+                    setVotingZoneIDInFeatures(geojson, data.vz_id);
+                    map.data.addGeoJson(geojson);
+                }
+
+                function setVotingZoneIDInFeatures(geojson, vz_id)
+                {
+                    for ( var index in geojson.features )
+                    {
+                        geojson.features[index].properties.vz_id = vz_id;
+                    }
                 }
             }
         }
+
     }
 })();

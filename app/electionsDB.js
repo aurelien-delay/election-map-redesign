@@ -11,7 +11,7 @@ function readElections(connection, settingsName, res)
 
     function returnElections(elections)
     {
-        console.log("return elections", elections);
+        console.log("return elections");
         res.json(elections);
     }
 }

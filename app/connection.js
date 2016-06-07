@@ -10,7 +10,6 @@ var VotingZoneModel = require('./models/votingZone.js');
 var PartyModel = require('./models/party.js');
 var ElectionModel = require('./models/election.js');
 var VzResultModel = require('./models/vz_result.js');
-var VzResultCandModel = require('./models/vz_result_candidate.js');
 
 
 // --- set the connection and others optons in a central sequelize object ---
@@ -21,11 +20,13 @@ var settings = SettingsModel.getSettingsModel(sequelize);
 var votingZone = VotingZoneModel.getVotingZoneModel(sequelize);
 var party = PartyModel.getPartyModel(sequelize);
 var election = ElectionModel.getElectionModel(sequelize);
-var vzResult = VzResultModel.getVZResultModel(sequelize);
-var vzResultCand = VzResultCandModel.getVZResultCandModel(sequelize);
+
+var vzResult2Tables = VzResultModel.getVZResultModel(sequelize);
+var vzResult = vzResult2Tables[0];
+var vzResultCand = vzResult2Tables[1];
 
 
-sequelize.sync().then(function(){console.log("sync finished");});
+// sequelize.sync().then(function(){console.log("sync finished");});
 
 // --- export the sequelize object with all the options, and all the defined models ---
 module.exports = {

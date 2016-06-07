@@ -12,7 +12,7 @@ function readVotingZonesID(connection, settingsName, res)
 
     function returnVotingZonesID(votingZoneIDs)
     {
-        console.log("return voting zone ID", votingZoneIDs );
+        console.log("return voting zone IDs" );
         res.json(votingZoneIDs);
     }
 }

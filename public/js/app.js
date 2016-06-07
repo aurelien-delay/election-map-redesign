@@ -3,7 +3,7 @@
     'use strict';
 
     angular.module('app', ['app.generalCtrl', 'app.settings', 'app.elections', 'app.parties', 'app.votingZones', 'app.results',
-                   'ngRoute'])
+                   'app.colorMap', 'ngRoute'])
     // --- routing ---
     .config(['$routeProvider', function ($routeProvider)
     {

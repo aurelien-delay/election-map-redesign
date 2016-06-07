@@ -11,7 +11,7 @@ function readSettings(connection, settingsName, res)
 
     function returnSettings(settings)
     {
-        console.log("return settings", settings);
+        console.log("return settings");
         res.json(settings);
     }
 }

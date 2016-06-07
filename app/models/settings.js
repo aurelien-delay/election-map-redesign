@@ -18,6 +18,7 @@ var settingsProperties = {
     center_lat:                     {type: Sequelize.FLOAT},
     center_lng:                     {type: Sequelize.FLOAT},
     abstentionColor:                {type: Sequelize.STRING},
+    emptyColor:                     {type: Sequelize.STRING},
     markAbstentionThreshold:        {type: Sequelize.STRING},
 
     // --- fields with JSON string ---

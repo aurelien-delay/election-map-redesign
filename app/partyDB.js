@@ -11,7 +11,7 @@ function readParties(connection, res)
 
     function returnParties(parties)
     {
-        console.log("return parties", parties);
+        console.log("return parties");
         res.json(parties);
     }
 }

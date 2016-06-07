@@ -6,7 +6,7 @@
         // --- controller ---
         .controller('GeneralCtrl', initMap);
 
-        function initMap(accessSettingsDB, accessElectionsDB, accessPartiesDB, accessVotingZonesDB, accessResultsDB, $q, $scope) {
+        function initMap(accessSettingsDB, accessElectionsDB, accessPartiesDB, accessVotingZonesDB, accessResultsDB, colorMap, $q, $scope) {
             console.info("GeneralCtrl starts...");
 
             // --- declared internal variables ---
@@ -15,40 +15,55 @@
             self.settings = {};
             self.parties = {};
             self.elections = [];
+            self.currentParty = "";
             self.currentElection = "";
+            self.currentMaxScore = 0;
             self.vz_ids = [];
-            self.current_election_results = {};
-            self.map = {};;
+            self.results = {};
+            self.map = {};
+            self.partyList = [];
+            self.colorScale = [];
+            self.textScale = [];
+            self.maxColor = 0;
+            self.settingsPromise = $q.defer();
+            self.mapPromise = $q.defer();
+            self.partiesPromise = $q.defer();
+            self.resultsPromise = $q.defer();
+            self.vz_ids_promise = $q.defer();
 
             // --- provided functions ---
             self.changeElection = changeElection;
             self.displayEvo = displayEvo;
-            self.electionLoadedPromise = electionLoadedPromise;
-
+            self.changeParty = changeParty;
+            self.changeMaxColor = changeMaxColor;
 
             // --- fill internal variables ---
+            // BEWARE : map-directive is played at the same time.
+            // and will trigger the drawing of the voting zones on google map after the resolution of the vz IDs promise.
             self.initMapFinished = false;
-            self.settingsPromise = readSettings();
+            readSettings();
             readParties();
             readElections();
-            self.settingsPromise.success(readElectionResults);
-            self.vz_ids_promise = readVotingZoneIDs();
-
-            electionLoadedPromise().then( function(){console.log("election load finished");});
+            readVotingZoneIDs();
+            self.settingsPromise.promise.then(readAndLoadElectionResults);
 
 
             // functions used in controller init ======================================================================
-            function readSettings()     {  return accessSettingsDB.get(self.settingsName).success( setSettingsInfo );  }
+            function readSettings()     {  accessSettingsDB.get(self.settingsName).success( setSettingsInfo );  }
             function setSettingsInfo(data) {
                 console.log("returned settings", data);
+                self.settingsPromise.resolve();
                 self.settings = data;
                 self.currentElection = self.settings.defaultElection;
+                self.currentParty = self.settings.defaultParty;
+                self.currentMaxScore = self.settings.defaultMaxScore;
                 self.initMapFinished = true;
             }
 
             function readParties()     {  accessPartiesDB.get().success( setParties );  }
             function setParties(data) {
                 console.log("returned parties", data);
+                self.partiesPromise.resolve();
                 self.parties = data;
             }
 
@@ -61,13 +76,54 @@
             function readVotingZoneIDs()    {   return accessVotingZonesDB.getIDs(self.settingsName).success( setVotingZoneIDsInfo ); }
             function setVotingZoneIDsInfo(data) {
                 console.log("returned voting zones IDs", data);
+                self.vz_ids_promise.resolve();
                 self.vz_ids = data;
             }
 
-            function readElectionResults()    { self.current_election_promise = accessResultsDB.get(self.currentElection).success( setCurrentElectionResults ); }
+            function readAndLoadElectionResults()
+            {
+                readElectionResults();
+                loadPartyList();
+                loadPartyColorSafe();
+            }
+            function readElectionResults()
+            {
+                self.resultsPromise = $q.defer();
+                accessResultsDB.get(self.currentElection).success( setCurrentElectionResults );
+            }
             function setCurrentElectionResults(data) {
                 console.log("returned election results", data);
-                self.current_election_results = data;
+                self.resultsPromise.resolve();
+                self.results = data;
+            }
+
+            function loadPartyColorSafe()
+            {
+                // color voting zones (wait to be safe)
+                self.mapPromise.promise.then(checkResults);
+                function checkResults() { self.resultsPromise.promise.then(callColorMap); }
+                function callColorMap() { colorMap.loadParty(self.map, self.settings, self.results, self.parties, self.currentMaxScore, self.currentParty); }
+
+                // display the color scale
+                loadColorScale();
+            }
+
+            function loadPartyList()
+            {
+                self.resultsPromise.promise.then(callPartyList);
+                function callPartyList() { self.partyList = colorMap.getPartyList(self.settings, self.parties, self.currentParty, self.results);};
+            }
+
+            function loadColorScale()
+            {
+                // load the color scale and its text (wait to be safe)
+                self.partiesPromise.promise.then(calcScale);
+                function calcScale()
+                {
+                    self.colorScale = colorMap.calcColorScale(self.settings, self.parties, self.currentParty, self.currentMaxScore);
+                    self.textScale = colorMap.calcTextScale(self.currentMaxScore);
+                    console.log("colorscale", self.colorScale);
+                }
             }
 
             // functions provided by the controller ===================================================================
@@ -75,7 +131,7 @@
             {
                 console.log("change election", button);
                 self.currentElection = button.election_id;
-                readElectionResults();
+                readAndLoadElectionResults();
             }
 
             function displayEvo()
@@ -85,16 +141,16 @@
                 // then display the diff between the 2 elections......
             }
 
-            function electionLoadedPromise()
+            function changeParty()
             {
-                // because first load of election must be made after settings are loaded,
-                // variable self.current_election_promise may only exists if settings Promise is resolved
-                // So we should check both promise to make sure the current election is loaded.
-                var promise = $q.defer();
-                self.settingsPromise.success( checkResultsSearch );
-                function checkResultsSearch(){ self.current_election_promise.success( giveGo ); }
-                function giveGo() { promise.resolve(); }
-                return promise.promise;
+                console.log("change party", self.currentParty);
+                loadPartyColorSafe();
+            }
+
+            function changeMaxColor()
+            {
+                console.log("change max color", self.currentMaxScore);
+                loadPartyColorSafe();
             }
         }
 })();

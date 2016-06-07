@@ -15,4 +15,33 @@
             </button>
         </div>
     </div>
+
+    <!-- List of labels present in currently displayed election -->
+    <!-- Click to focus on one label -->
+    <div ng-if="ctrl.partyList.length > 0" id="partyList">
+        <p class="partyListBox" ng-repeat="party in ctrl.partyList" ng-style="{color:party.color}" >
+            <input type="radio" id="party" ng-model="ctrl.currentParty" ng-click="ctrl.changeParty()" value="{{party.label}}"></input>
+            {{party.label}}
+        </p>
+        <hr>
+        <p class="labelBox" ng-style="{color:ctrl.settings.abstentionColor}">
+            <input type="radio" id="label" ng-model="ctrl.currentParty" ng-click="ctrl.changeParty()" value="abstention"></input>
+        Abstention
+        </p>
+    </div>
+
+    <!-- Display the reference color scale -->
+    <div id="colorscale">
+        <div id="scalecontainer">
+            <span class="colorscale" ng-repeat="scalepart in ctrl.colorScale" ng-style="scalepart"> </span>
+            <span class="textscale" ng-repeat="scalepart in ctrl.textScale" ng-style="{left:scalepart.left, right:scalepart.right}">{{scalepart.text}}</span>
+        </div>
+    </div>
+    <!-- Choose themax value on the color scale -->
+    <div id="sliderColorScale" class="sliderColorScale">
+        <p> Echelle de couleur : </p>
+        <input id="slider" type="range" min="1" max="100" value="25" ng-model="ctrl.currentMaxScore" ng-change="ctrl.changeMaxColor()" />
+        <input id="sliderValue" type="text" ng-model="ctrl.currentMaxScore" ng-change="ctrl.changeMaxColor()" />
+        <span>%</span>
+    </div>
 </div>
