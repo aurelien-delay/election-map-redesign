@@ -47,8 +47,8 @@
 
     <!-- Display the details for one voting area - either by hovering on it or clicking on it -->
     <div id="tooltip" ng-if="ctrl.displayTooltip">
-        <p class="name">{{ctrl.tooltipVz.Name}}</p>
-        <p ng-repeat="result in ctrl.tooltipVz.partyResults">
+        <p class="name">{{ctrl.tooltipVz['Name']}}</p>
+        <p ng-repeat="result in ctrl.tooltipVz['partyResults']">
             <span class='label' ng-style="{color:result.color}">{{result.label}}</span>
             <span ng-style="{color:result.color}"> : </span>
             <span class='score' ng-style="{color:result.color}">{{result.ratio_exprimes}} %</span>
@@ -57,7 +57,7 @@
         <p>
             <span class='label' ng-style="{color:ctrl.settings.abstentionColor}">Abstention</span>
             <span ng-style="{color:ctrl.settings.abstentionColor}"> : </span>
-            <span class='score' ng-style="{color:ctrl.settings.abstentionColor}">{{ctrl.tooltipVz.non_exprimes_ratio}} %</span>
+            <span class='score' ng-style="{color:ctrl.settings.abstentionColor}">{{ctrl.tooltipVz['non_exprimes_ratio']}} %</span>
         </p>
     </div>
 </div>

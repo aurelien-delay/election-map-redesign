@@ -20,7 +20,7 @@
         // --- implement all functions linked to return ---
         function loadParty(map, settings, results, parties, max, newParty)
         {
-            console.log("loadParty", map, results, parties,  newParty);
+            // console.log("loadParty", map, results, parties,  newParty);
             var color = getPartyColor(settings, parties, newParty);
 
             // --- use googlemap functions to set the new colors in zones ---
@@ -58,6 +58,7 @@
             {
                 if ( party == parties[index].label )    return parties[index].color;
             }
+            return settings.emptyColor;
         }
 
         function computeSortedLabelList(settings, parties, currentParty, results)
@@ -149,9 +150,8 @@
             if ( vzResult )
             {
                 // --- loop on party results and fill output object ---
-                output.Name = feature.getProperty("Name");
-                output.partyResults = [];
-                console.log(vzResult);
+                output['Name'] = feature.getProperty("Name");
+                output['partyResults'] = [];
                 for ( var i in vzResult.vz_result_candidates )
                 {
                     var partyLine = {};
@@ -160,13 +160,13 @@
                     partyLine.label = partyListInResult.join("/");
                     partyLine.color = getPartyColor(settings, parties, partyListInResult[0] );
                     partyLine.ratio_exprimes = getPartyRatio(partyResult, vzResult);
-                    output.partyResults.push(partyLine);
+                    output['partyResults'].push(partyLine);
                 }
 
                 // --- add abstention ratio to output object ---
-                output.non_exprimes_ratio = getNonExprimesRatio(vzResult);
+                output['non_exprimes_ratio'] = getNonExprimesRatio(vzResult);
             }
-            console.log("tooltip:", output);
+            // console.log("tooltip:", output);
             return output;
         }
 
@@ -188,7 +188,6 @@
 
         function getNonExprimesRatio(zoneResult)
         {
-            console.log(zoneResult);
             return Math.round( (zoneResult.inscrits - zoneResult.exprimes) * 100 / zoneResult.inscrits ).toFixed(2);
         }
 

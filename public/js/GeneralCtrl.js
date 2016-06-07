@@ -128,7 +128,6 @@
                 {
                     self.colorScale = colorMap.calcColorScale(self.settings, self.parties, self.currentParty, self.currentMaxScore);
                     self.textScale = colorMap.calcTextScale(self.currentMaxScore);
-                    console.log("colorscale", self.colorScale);
                 }
             }
 

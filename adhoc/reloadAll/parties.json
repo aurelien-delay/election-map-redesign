@@ -1,0 +1,19 @@
+{
+    "parties" : [
+        { "label":"NPA", "color":"#FF4D4D"},
+        { "label":"FO", "color":"#FF4D4D"},
+        { "label":"FDG", "color":"red"},
+        { "label":"EELV", "color":"green"},
+        { "label":"ND", "color":"DeepPink"},
+        { "label":"PS", "color":"MediumVioletRed"},
+        { "label":"ECO", "color":"DarkGreen"},
+        { "label":"MODEM", "color":"orange"},
+        { "label":"DVD", "color":"RoyalBlue"},
+        { "label":"UPR", "color":"MidnightBlue"},
+        { "label":"UDI", "color":"CornflowerBlue"},
+        { "label":"UMP", "color":"MediumBlue"},
+        { "label":"DLF", "color":"Navy"},
+        { "label":"FN", "color":"Maroon"},
+        { "label":"EXD", "color":"Brown"}
+    ]
+}
